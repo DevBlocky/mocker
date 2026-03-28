@@ -38,6 +38,11 @@ static int childmain(const char *rootfs, const char *ttypath) {
     perror("mount --bind rootfs");
     return 1;
   }
+  // the bind mount inherits MS_NOSUID from the workspace mount (VS Code
+  // devcontainers mount workspaces nosuid); remount to clear it so setuid
+  // binaries like sudo work inside the container
+  if (mount(rootfs, rootfs, NULL, MS_BIND | MS_REMOUNT, NULL) < 0)
+    perror("mount --remount rootfs (setuid may not work)");
 
   // mount rootfs/dev
   snprintf(path, sizeof(path), "%s/dev", rootfs);

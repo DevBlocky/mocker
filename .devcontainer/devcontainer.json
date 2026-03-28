@@ -1,9 +1,10 @@
 {
   "name": "distro-dev",
   "build": { "dockerfile": "Dockerfile", "context": ".." },
-  "runArgs": [
-    "-v",
-    "/var/run/docker.sock:/var/run/docker.sock"
+  "runArgs": ["--privileged"],
+  "mounts": [
+    "source=distro-dev-extensions,target=/root/.vscode-server/extensions,type=volume",
+    "source=distro-dev-server-data,target=/root/.vscode-server/data/Machine,type=volume"
   ],
   "customizations": {
     "vscode": {

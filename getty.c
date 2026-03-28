@@ -19,10 +19,12 @@ int main(int argc, char **argv) {
   }
   signal(SIGINT, SIG_IGN);
   signal(SIGQUIT, SIG_IGN);
+  // tcsetpgrp() sends SIGTTOU to background callers, ignore it so we can
+  // claim the terminal foreground without being stopped
+  signal(SIGTTOU, SIG_IGN);
 
-  // create a new session and open the tty as the
-  // controlling terminal for this session
-  setsid();
+  // move into own process group (stay in host session so tcsetpgrp works)
+  setpgid(0, 0);
   int ttyfd = open(argv[1], O_RDWR);
   if (ttyfd < 0) {
     fprintf(stderr, "(%s: open '%s': %s)\n", argv[0], argv[1], strerror(errno));

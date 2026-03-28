@@ -1,4 +1,3 @@
-IMAGE ?= distro-init
 CC ?= cc
 CFLAGS ?= -O2 -pipe -Wall
 LDFLAGS ?=
@@ -10,7 +9,7 @@ ROOTFS := rootfs
 SBINS := init getty login adduser gpasswd kill shutdown
 BINS := sh echo ls cat mv cp rm mkdir pwd env sleep segfault whoami sudo su gpasswd
 
-.PHONY: all build rootfs docker-build docker-run clean
+.PHONY: all build rootfs run clean
 
 all: rootfs
 
@@ -38,12 +37,11 @@ rootfs: $(ALL_TARGETS)
 	@chmod 600 $(ROOTFS)/etc/shadow
 	@chmod u+s $(ROOTFS)/usr/bin/sudo $(ROOTFS)/usr/bin/su
 
-docker-build: rootfs
-	docker build -t $(IMAGE) .
+mocker: mocker.o
+	$(CC) $(LDFLAGS) $^ -o $@
 
-docker-run: docker-build
-	docker run -ti --rm $(IMAGE)
+run: rootfs mocker
+	./mocker rootfs
 
 clean:
-	rm -rf $(ROOTFS)
-	-@docker rmi -f $(IMAGE) >/dev/null 2>&1 || true
+	rm -rf $(ROOTFS) mocker *.o

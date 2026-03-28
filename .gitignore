@@ -1,2 +1,4 @@
 /rootfs/
+/mocker
+.DS_Store
 *.o
